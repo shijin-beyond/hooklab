@@ -3,6 +3,25 @@
 Short, dated records of decisions that would be expensive to reverse or confusing to
 rediscover. Newest first.
 
+## 2026-11-13 — Vertical slice: Fastify + node:sqlite + React/Vite
+
+- Backend: Fastify 5, serving both `/api/*` and the built dashboard
+  (`@fastify/static`). Chosen for a small, explicit HTTP surface.
+- Persistence: `node:sqlite` (built into Node >= 22.13) — durable local history with
+  zero native or external dependencies.
+- Frontend: React 19 + Vite 8 in `web/`; in production the server serves `web/dist`,
+  in development Vite proxies `/api` to the server.
+- Scheduling is in-process and sequential. Runs are never resumed: `openDb` marks
+  `pending`/`running` runs and `sending` attempts `interrupted` on startup, because
+  an attempt that may already have reached the target must not be resent. A
+  database-backed scheduler is only needed when we add resumable schedules.
+- Delivery: one `fetch` per attempt with `redirect: "manual"`, `AbortSignal.timeout`
+  for timeouts, and a streaming read capped at `maxResponsePreviewBytes`. The event
+  payload is stored as a `BLOB` and sent as raw bytes; headers are validated against
+  a forbidden set (host, content-length, connection, …) at write time.
+- Three tables — `events`, `runs`, `attempts` — map the model separation; duplicates
+  are new attempts on the same event, never new events.
+
 ## 2026-11-13 — Language, runtime, and module system
 
 HookLab is written in TypeScript (strict mode, including `noUncheckedIndexedAccess` and

@@ -24,12 +24,18 @@ reproducible tests, and concise documentation come first.
 ```sh
 npm ci              # install dependencies (uses package-lock.json)
 npm test            # run tests (vitest)
-npm run typecheck   # strict TypeScript check
+npm run typecheck   # strict TypeScript check (server + web)
 npm run lint        # eslint
 npm run format:check  # prettier check
 npm run format      # prettier write
-npm run build       # compile to dist/
+npm run build       # compile server to dist/ and dashboard to web/dist/
+npm run dev         # tsx watch server + vite dev server
+npm start           # run the built app (UI + API on 127.0.0.1:4737)
+npm run example:receiver  # local counting receiver on 127.0.0.1:4040
 ```
+
+Layout: `src/` is the Fastify + node:sqlite backend, `web/` the React+Vite dashboard,
+`test/` vitest suites, `examples/` standalone helpers.
 
 ## Scope
 
